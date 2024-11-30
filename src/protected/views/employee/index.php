@@ -5,7 +5,7 @@ $this->breadcrumbs=array(
 
 $this->menu=array(
 	array('label'=>'Create Employee', 'url'=>array('create')),
-	array('label'=>'Manage Employee', 'url'=>array('admin')),
+	array('label'=>'Manage Employee', 'url'=>array('admin'),'visible' => Yii::app()->user->getState('is_admin')),
 );
 ?>
 

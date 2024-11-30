@@ -67,7 +67,7 @@ class EmployeeController extends Controller
 	 */
 	public function actionCreate()
 	{
-		$model=new Employee;
+		$model=new Employee('create');
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
@@ -100,19 +100,31 @@ class EmployeeController extends Controller
 	public function actionUpdate()
 	{
 		$model=$this->loadModel();
+		$model->scenario = 'update'; // Set scenario to 'update
 
 		// Uncomment the following line if AJAX validation is needed
 		// $this->performAjaxValidation($model);
 
 		if(isset($_POST['Employee']))
 		{
+			$attributes = $model->attributes;
 			$model->attributes=$_POST['Employee'];
-			$model->attributes = array (
-				'password' => CPasswordHelper::hashPassword($model->attributes['password'])
-			);
+			if(array_key_exists('password',$_POST['Employee']) && !empty($_POST['Employee']['password']))
+			{
+				$model->attributes = array (
+					'password' => CPasswordHelper::hashPassword($model->attributes['password'])
+				);
+			}else{				
+				// Reset empty password to previous hashed one in case the password was not changed!
+				$model->attributes = $attributes;
+			}
+			
+
 			if($model->save())
 				$this->redirect(array('view','id'=>$model->id));
 		}
+
+		$model->password = null;
 
 		$this->render('update',array(
 			'model'=>$model,

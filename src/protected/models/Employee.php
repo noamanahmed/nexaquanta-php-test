@@ -26,8 +26,12 @@ class Employee extends CActiveRecord
 	{
 		// NOTE: you should only define rules for those attributes that
 		// will receive user inputs.
+
+		// Password field is NOT mandatory on update to allow users to change
+		// there data without entering password again and again.
 		return array(
-			array('name,password', 'required'),
+			array('name,password', 'required','on' => 'create'),
+			array('name', 'required','on' => 'update'),
 			array('name, email, password', 'length', 'max'=>255),
 			array('email', 'email'),
 			array('email', 'unique'),

@@ -9,7 +9,7 @@ $this->menu=array(
 	array('label'=>'Create Employee', 'url'=>array('create')),
 	array('label'=>'Update Employee', 'url'=>array('update', 'id'=>$model->id)),
 	array('label'=>'Delete Employee', 'url'=>'#', 'linkOptions'=>array('submit'=>array('delete','id'=>$model->id),'confirm'=>Yii::t('zii','Are you sure you want to delete this item?'))),
-	array('label'=>'Manage Employee', 'url'=>array('admin')),
+	array('label'=>'Manage Employee', 'url'=>array('admin'), 'visible' => Yii::app()->user->getState('is_admin')),
 );
 ?>
 

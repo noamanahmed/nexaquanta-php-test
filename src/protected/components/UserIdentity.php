@@ -17,17 +17,22 @@ class UserIdentity extends CUserIdentity
 	 */
 	public function authenticate()
 	{
-		$users=array(
-			// username => password
-			'demo'=>'demo',
-			'admin'=>'admin',
-		);
-		if(!isset($users[$this->username]))
-			$this->errorCode=self::ERROR_USERNAME_INVALID;
-		elseif($users[$this->username]!==$this->password)
-			$this->errorCode=self::ERROR_PASSWORD_INVALID;
-		else
-			$this->errorCode=self::ERROR_NONE;
-		return !$this->errorCode;
+		  // Find the user by username
+		  $user = User::model()->findByAttributes(array('name' => $this->username));
+    
+		  if ($user === null) {
+			  // Username not found
+			  $this->errorCode = self::ERROR_USERNAME_INVALID;
+		  } elseif (!CPasswordHelper::verifyPassword($this->password, $user->password)) {
+			  // Password does not match (assumes password is hashed in the database)
+			  $this->errorCode = self::ERROR_PASSWORD_INVALID;
+		  } else {
+			  // Authentication successful
+			  $this->errorCode = self::ERROR_NONE;
+			  // Optionally, set additional session attributes for admin
+			  Yii::app()->user->setState('is_admin', $user->name === 'admin');
+		  }
+	  
+		  return !$this->errorCode;
 	}
 }
