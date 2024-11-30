@@ -1,0 +1,62 @@
+services:
+  php:
+    build:
+      context: ./devops/php
+      dockerfile: Dockerfile
+    container_name: yii-php
+    volumes:
+      - ./src:/var/www/html
+    depends_on:
+      - mysql
+    networks:
+      - yii-network
+
+  mysql:
+    image: mysql:5.7
+    container_name: yii-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: yii
+      MYSQL_DATABASE: yii
+      MYSQL_USER: yii
+      MYSQL_PASSWORD: yii
+    volumes:
+      - yii-mysql-data:/var/lib/mysql
+    networks:
+      - yii-network
+  adminer:        
+    container_name: yii-adminer
+    image: adminer:latest        
+    restart: unless-stopped
+    ports:
+    - 8066:8080
+    environment:    
+        ADMINER_DESIGN: pepa-linha
+        ADMINER_DEFAULT_SERVER: yii-mysql
+        ADMINER_USERNAME: root
+        ADMINER_PASSWORD: yii
+        ADMINER_AUTOLOGIN: 1        
+    command: ["php", "-d", "post_max_size=512M", "-d", "upload_max_filesize=512M", "-S", "0.0.0.0:8080", "-t", "/var/www/html"]
+    depends_on:
+      - mysql
+    networks:
+      - yii-network
+  nginx:
+    image: nginx:alpine
+    container_name: yii-nginx
+    volumes:
+      - ./devops/nginx:/etc/nginx/conf.d
+      - ./src:/var/www/html
+    ports:
+      - "9999:80"
+    depends_on:
+      - php
+    networks:
+      - yii-network
+
+volumes:
+  yii-mysql-data:
+  yii-root:
+    driver: local
+
+networks:
+  yii-network:
